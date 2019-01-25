@@ -1,0 +1,51 @@
+version: '3'
+services:
+
+  #mysql вторая папка для тестовой базы
+  mysql:
+    image: 'mysql:5.7'
+    restart: always
+    volumes:
+    - '~/mysql-test/:/var/lib/mysql/'
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: prize_generator
+    ports:
+    - "3306:3306"
+    networks:
+      - my-new-network
+
+  #nginx без изменений
+  nginx:
+    image: "nginx:latest"
+    restart: always
+    volumes:
+      - './docker/nginx/conf.d/:/etc/nginx/conf.d/'
+      - './:/var/www/html/prizeGenerator'
+    ports:
+    - "80:80"
+    - "443:443"
+    depends_on:
+      - fpm
+      - mysql
+    networks:
+      - my-new-network
+
+  #Настроенный fpm со всеми либами
+  fpm:
+    build:
+      context: ./docker/fpm
+      dockerfile: Dockerfile
+    volumes:
+      - '/var/www/html/prizeGenerator/:/var/www/html/prizeGenerator/'
+    depends_on:
+      - mysql
+    environment:
+      USER: dastanaron
+    networks:
+      - my-new-network
+
+
+networks:
+  my-new-network:
+    driver: bridge
