@@ -9,8 +9,11 @@ use yii\web\Controller;
 use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
-use app\models\ContactForm;
 
+/**
+ * Class SiteController
+ * @package app\controllers
+ */
 class SiteController extends Controller
 {
     /**
@@ -89,6 +92,7 @@ class SiteController extends Controller
 
     /**
      * @return string|Response
+     * @throws \yii\base\Exception
      */
     public function actionSignUp()
     {

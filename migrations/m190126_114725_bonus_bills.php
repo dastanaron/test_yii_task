@@ -8,8 +8,14 @@ use yii\db\Migration;
  */
 class m190126_114725_bonus_bills extends Migration
 {
+    /**
+     * @var string
+     */
     public $tableName = 'bonus_bills';
 
+    /**
+     * @return bool|void
+     */
     public function up()
     {
         $tableOptions = null;
@@ -50,6 +56,9 @@ class m190126_114725_bonus_bills extends Migration
         );
     }
 
+    /**
+     * @return bool|void
+     */
     public function down()
     {
         $this->dropTable($this->tableName);

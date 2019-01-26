@@ -11,10 +11,22 @@ use yii\base\Model;
  */
 class SignUpForm extends Model
 {
+    /**
+     * @var string
+     */
     public $login;
+    /**
+     * @var string
+     */
     public $password;
+    /**
+     * @var array
+     */
     public $errors;
 
+    /**
+     * @var object|Users
+     */
     private $user;
 
     /**
@@ -28,6 +40,10 @@ class SignUpForm extends Model
         ];
     }
 
+    /**
+     * @return bool
+     * @throws \yii\base\Exception
+     */
     public function registerUser()
     {
         $user = new Users();
@@ -49,6 +65,9 @@ class SignUpForm extends Model
 
     }
 
+    /**
+     * @return bool
+     */
     public function login()
     {
         if ($this->validate()) {

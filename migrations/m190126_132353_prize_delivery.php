@@ -8,8 +8,14 @@ use yii\db\Migration;
  */
 class m190126_132353_prize_delivery extends Migration
 {
+    /**
+     * @var string
+     */
     public $tableName = 'prize_delivery';
 
+    /**
+     * @return bool|void
+     */
     public function up()
     {
         $tableOptions = null;
@@ -62,6 +68,9 @@ class m190126_132353_prize_delivery extends Migration
         $this->execute('ALTER TABLE '.$this->tableName.' CHANGE `created_at` `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP');
     }
 
+    /**
+     * @return bool|void
+     */
     public function down()
     {
         $this->dropTable($this->tableName);
