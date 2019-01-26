@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\SignUpForm;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -87,6 +88,34 @@ class SiteController extends Controller
     }
 
     /**
+     * @return string|Response
+     */
+    public function actionSignUp()
+    {
+        if (!Yii::$app->user->isGuest) {
+            return $this->goHome();
+        }
+
+        $model = new SignUpForm();
+        if ($model->load(Yii::$app->request->post()) && $model->registerUser()) {
+            if($model->login())
+            {
+                return $this->goBack();
+            }
+            else
+            {
+                $model->errors[] = "Unable to authorize";
+            }
+
+        }
+
+        $model->password = '';
+        return $this->render('signup', [
+            'model' => $model,
+        ]);
+    }
+
+    /**
      * Logout action.
      *
      * @return Response
@@ -98,31 +127,4 @@ class SiteController extends Controller
         return $this->goHome();
     }
 
-    /**
-     * Displays contact page.
-     *
-     * @return Response|string
-     */
-    public function actionContact()
-    {
-        $model = new ContactForm();
-        if ($model->load(Yii::$app->request->post()) && $model->contact(Yii::$app->params['adminEmail'])) {
-            Yii::$app->session->setFlash('contactFormSubmitted');
-
-            return $this->refresh();
-        }
-        return $this->render('contact', [
-            'model' => $model,
-        ]);
-    }
-
-    /**
-     * Displays about page.
-     *
-     * @return string
-     */
-    public function actionAbout()
-    {
-        return $this->render('about');
-    }
 }
