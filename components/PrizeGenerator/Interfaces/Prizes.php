@@ -9,7 +9,9 @@ namespace app\components\PrizeGenerator\Interfaces;
  */
 interface Prizes
 {
-    public function take();
+    public function take($value);
+
+    public function calculate();
 
     public function refuse();
 

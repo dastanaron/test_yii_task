@@ -62,11 +62,12 @@ class LotteryController extends \yii\web\Controller
         try
         {
             $prize = $prizeGenerator->getStrategy();
+            $prize->calculate();
         }
         catch (\Exception $e)
         {
             //Пишем в лог и кидаем на страницу извините ничо не выйграли
-            $this->redirect('/site');
+            $this->redirect('lose');
         }
 
         $model = new LotteryChooseForm();
@@ -83,7 +84,7 @@ class LotteryController extends \yii\web\Controller
     }
 
     /**
-     * Получаем приз
+     * Отвечаем что делаем с призом
      */
     public function actionAnswer()
     {
@@ -95,11 +96,17 @@ class LotteryController extends \yii\web\Controller
 
             switch ($model->action) {
                 case 'take':
-                    echo $model->action;
+                    $prizeStrategy->take($model->value);
+                    return $this->redirect('/site/index');
                 case 'refuse':
-                    $prizeStrategy->refuse();
+                    return $prizeStrategy->refuse();
                 case 'convert':
-                    echo $model->action;
+                    if($prizeStrategy instanceof Convertible)
+                    {
+                        $prizeStrategy->convert($model->value);
+                    }
+                    //Можно на страницу с ошибкой послать, если не Convertible
+                    return $this->redirect('/site/index');
                 default:
                     //todo: тут можно обработать неверный кейс
                     break;
@@ -108,7 +115,8 @@ class LotteryController extends \yii\web\Controller
     }
 
     /**
-     * Отказываемся от приза
+     * Когда отказались от приза
+     * @return string
      */
     public function actionRefuse()
     {
@@ -116,11 +124,12 @@ class LotteryController extends \yii\web\Controller
     }
 
     /**
-     * Конвертируем приз
+     * Когда выйграли приз, которого не осталось
+     * @return string
      */
-    public function actionConvert()
+    public function actionLose()
     {
-        echo "convert";
+        return $this->render('lose');
     }
 
 }

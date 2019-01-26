@@ -1,4 +1,4 @@
 <?php
 /* @var $this yii\web\View */
 ?>
-<h1>You refused the prize</h1>
+<h1>Sorry, You Lose</h1>

@@ -2,8 +2,10 @@
 
 namespace app\components\PrizeGenerator\Prizes;
 
+use Yii;
 use app\components\PrizeGenerator\Interfaces\Prizes;
 use app\components\PrizeGenerator\Traits\Refuse;
+use app\models\PrizeDelivery;
 use app\models\PrizeItems;
 use yii\helpers\VarDumper;
 
@@ -18,50 +20,83 @@ class Item implements Prizes
     use Refuse;
 
     /**
-     * @var array|PrizeItems[]
+     * @var
      */
-    protected $items;
-
     protected $value;
 
+    /**
+     * @var
+     */
     protected $name;
 
+    /**
+     * Item constructor.
+     * В этой стратегии не пригодился
+     */
     public function __construct()
     {
-        $this->items = PrizeItems::find()->where(['>','count', 0])->all();
-        $this->calculate();
+
     }
 
-    public function take()
+    /**
+     * В этой стратегии, нам в качестве value приходит id предмета
+     * Поэтому ищем прдмет, отнимаем 1 и сохраняем. Так же делаем запись в таблицу доставки
+     * @param $value
+     * @return bool
+     */
+    public function take($value)
     {
-        // TODO: Implement take() method.
+        $item = PrizeItems::findOne(['id' => $value]);
+        $item->count -= 1;
+
+        $minusItem = $item->save();
+
+        $userId = Yii::$app->user->identity->getId();
+
+        $delivery = new PrizeDelivery();
+        $delivery->count = 1;
+        $delivery->prize_item_id = $value;
+        $delivery->user_id = $userId;
+
+        $sentToDelivery = $delivery->save();
+
+        return $minusItem && $sentToDelivery;
     }
 
+    /**
+     * @return string
+     */
     public function getName()
     {
         return "item: " . $this->name;
     }
 
+    /**
+     * @return mixed
+     */
     public function getValue()
     {
         return $this->value;
     }
 
-    private function calculate()
+    /**
+     * @throws \Exception
+     */
+    public function calculate()
     {
-        if(empty($this->items))
+        $items = PrizeItems::find()->where(['>','count', 0])->all();
+
+        if(empty($items))
         {
             throw new \Exception('not enough money');
         }
 
-        $countElements = count($this->items);
+        $countElements = count($items);
 
         $randomElementNumber = mt_rand(0, $countElements-1);
 
-        $this->value = $this->items[$randomElementNumber]->id;
+        $this->value = $items[$randomElementNumber]->id;
 
-        $this->name = $this->items[$randomElementNumber]->name;
+        $this->name = $items[$randomElementNumber]->name;
     }
-
-
 }

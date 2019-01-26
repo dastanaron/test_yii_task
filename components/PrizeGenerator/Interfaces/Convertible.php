@@ -9,5 +9,5 @@ namespace app\components\PrizeGenerator\Interfaces;
  */
 interface Convertible
 {
-    public function convert();
+    public function convert($value);
 }

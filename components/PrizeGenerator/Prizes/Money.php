@@ -2,12 +2,14 @@
 
 namespace app\components\PrizeGenerator\Prizes;
 
+use app\models\BonusBills;
+use Yii;
+use app\components\BankTransactions\Robokassa;
 use app\components\PrizeGenerator\Interfaces\Convertible;
 use app\components\PrizeGenerator\Interfaces\Prizes;
 use app\components\PrizeGenerator\Registry;
 use app\components\PrizeGenerator\Traits\Refuse;
 use app\models\FirmBills;
-use yii\helpers\VarDumper;
 
 /**
  * Class Money
@@ -53,19 +55,51 @@ class Money implements Prizes, Convertible
     }
 
     /**
-     *
+     * Здесь все просто, деньги со счета компании не списываем, так как
+     * это бонусный баланс, и мы можем сэкономить на сумме. Ну если надо списать, то можно и списать
+     * Затем мы перемножаем на коэффициент конвертации и прибавляем к текущей сумме бонусного баланса.
+     * Если счета нет, то заводим, хотя такие вещи хорошо бы заводить при регистрации
+     * @param $value
+     * @return bool
      */
-    public function convert()
+    public function convert($value)
     {
-        // TODO: Implement convert() method.
+        $coefficient = Registry::getParamsObject()->convertCoefficient;
+
+        $userId = Yii::$app->user->identity->getId();
+
+        $userBonusBill = BonusBills::find()->where(['user_id' => $userId])->one();
+
+        if(empty($userBonusBill))
+        {
+            $userBonusBill = new BonusBills();
+            $userBonusBill->sum = 0;
+            $userBonusBill->user_id = $userId;
+        }
+
+        $convertMoneyToBonus = $value * $coefficient;
+
+        $userBonusBill->sum += $convertMoneyToBonus;
+
+        return $userBonusBill->save();
     }
 
     /**
-     *
+     * Тут мы отнимаем сумму и отправляем ее клиенту, списывая у фирмы
+     * По хорошему нужно еще писать табличку кому и сколько мы перевели, но я уже устал
+     * @param $value
+     * @return bool
      */
-    public function take()
+    public function take($value)
     {
-        // TODO: Implement take() method.
+        $currentSum = $this->model->total_sum;
+        $this->model->total_sum = $currentSum - $value;
+        $saveFirmSum = $this->model->save();
+
+        $bank = new Robokassa(Yii::$app->user->identity->getId());
+        $resultTransactionToClient = $bank->sendMoneyToClient($value);
+
+        return $saveFirmSum && $resultTransactionToClient;
     }
 
     /**
@@ -87,7 +121,7 @@ class Money implements Prizes, Convertible
     /**
      * @throws \Exception
      */
-    protected function calculate()
+    public function calculate()
     {
         $value = mt_rand($this->params->min, $this->params->max);
 
