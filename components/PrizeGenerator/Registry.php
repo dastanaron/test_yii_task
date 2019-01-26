@@ -2,6 +2,7 @@
 
 namespace app\components\PrizeGenerator;
 
+use app\components\PrizeGenerator\Interfaces\Convertible;
 use app\components\PrizeGenerator\Interfaces\Prizes;
 use Yii;
 

@@ -3,7 +3,9 @@
 namespace app\components\PrizeGenerator\Prizes;
 
 use app\components\PrizeGenerator\Interfaces\Prizes;
+use app\components\PrizeGenerator\Registry;
 use app\components\PrizeGenerator\Traits\Refuse;
+use app\models\BonusBills;
 
 /**
  * Class BonusPoints
@@ -16,6 +18,22 @@ class BonusPoints implements Prizes
 
     const NAME = 'Bonus points';
 
+    protected $params;
+
+    protected $value;
+
+    protected $model;
+
+    public function __construct()
+    {
+        $this->params = Registry::getParamsObject()->bonusPoints;
+
+        $userId = \Yii::$app->user->identity->getId();
+        $this->model = BonusBills::findOne(['user_id' => $userId]);
+
+        $this->calculate();
+    }
+
     public function take()
     {
         // TODO: Implement take() method.
@@ -23,12 +41,17 @@ class BonusPoints implements Prizes
 
     public function getName()
     {
-        return self::NAME;
+        return $this->getValue() . ' ' . self::NAME;
     }
 
     public function getValue()
     {
-        // TODO: Implement getValue() method.
+        return $this->value;
+    }
+
+    protected function calculate()
+    {
+        $this->value = mt_rand($this->params->min, $this->params->max);
     }
 
 
