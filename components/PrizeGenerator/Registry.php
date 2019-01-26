@@ -2,6 +2,7 @@
 
 namespace app\components\PrizeGenerator;
 
+use app\components\PrizeGenerator\Interfaces\Prizes;
 use Yii;
 
 /**
@@ -11,18 +12,28 @@ use Yii;
  */
 class Registry
 {
-    const TYPE_MONEY_PRIZE = 1;
-    const TYPE_BONUS_POINTS_PRIZE = 2;
-    const TYPE_ITEM_PRIZE = 3;
+    /**
+     * @param $name
+     * @return int
+     */
+    public static function getTypeByName($name)
+    {
+        return self::getParamsObject()->prizesTypes->$name;
+    }
 
     /**
-     * @return array
-     * @throws \ReflectionException
+     * @param $type
+     * Получаем класс стратегии по типу
+     * @return Prizes
      */
-    public static function getTypes()
+    public static function getObjectByType($type)
     {
-        $reflection = new \ReflectionClass(__CLASS__);
-        return $reflection->getConstants();
+        foreach (self::getParams()['prizesTypes'] as $item) {
+            if($item['type'] == $type)
+            {
+                return new $item['class']();
+            }
+        }
     }
 
     /**
@@ -37,6 +48,7 @@ class Registry
      * Собирает удобный объект
      * @example
             Структура объекта
+            $object->prizesTypes
             $object->bonusPoints->min $object->bonusPoints->max
             $object->money->min $object->bonusPoints->max
             $object->convertCoefficient

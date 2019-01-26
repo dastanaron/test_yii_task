@@ -4,6 +4,7 @@ namespace app\components\PrizeGenerator\Prizes;
 
 use app\components\PrizeGenerator\Interfaces\Convertible;
 use app\components\PrizeGenerator\Interfaces\Prizes;
+use app\components\PrizeGenerator\Traits\Refuse;
 
 /**
  * Class Money
@@ -13,6 +14,10 @@ use app\components\PrizeGenerator\Interfaces\Prizes;
  */
 class Money implements Prizes, Convertible
 {
+    use Refuse;
+
+    const NAME = 'Money';
+
     public function convert()
     {
         // TODO: Implement convert() method.
@@ -23,9 +28,15 @@ class Money implements Prizes, Convertible
         // TODO: Implement take() method.
     }
 
-    public function refuse()
+    public function getName()
     {
-        // TODO: Implement refuse() method.
+        return self::NAME;
     }
+
+    public function getValue()
+    {
+        // TODO: Implement getValue() method.
+    }
+
 
 }

@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\components\PrizeGenerator\Registry;
+use app\components\PrizeGenerator\Start;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\helpers\VarDumper;
@@ -47,9 +48,46 @@ class LotteryController extends \yii\web\Controller
         return $this->render('index');
     }
 
+    /**
+     * Начинаем играть и выбираем что делаем с призом
+     * @return string
+     */
     public function actionPlay()
     {
-        VarDumper::dump(Registry::getTypes(), 10, true);
+        $prizeGenerator = new Start();
+
+        $prize = $prizeGenerator->getStrategy();
+
+        VarDumper::dump($prize->getName(), 10, true);
+
+        return $this->render('play', [
+            'prizeName' => $prize->getName(),
+            'prizeValue' => $prize->getValue(),
+        ]);
+    }
+
+    /**
+     * Получаем приз
+     */
+    public function actionTakePrize()
+    {
+
+    }
+
+    /**
+     * Отказываемся от приза
+     */
+    public function actionRefuse()
+    {
+
+    }
+
+    /**
+     * Конвертируем приз
+     */
+    public function actionConvert()
+    {
+
     }
 
 }

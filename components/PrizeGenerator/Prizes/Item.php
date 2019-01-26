@@ -3,6 +3,7 @@
 namespace app\components\PrizeGenerator\Prizes;
 
 use app\components\PrizeGenerator\Interfaces\Prizes;
+use app\components\PrizeGenerator\Traits\Refuse;
 
 /**
  * Class Item
@@ -12,14 +13,22 @@ use app\components\PrizeGenerator\Interfaces\Prizes;
  */
 class Item implements Prizes
 {
+    use Refuse;
+
     public function take()
     {
         // TODO: Implement take() method.
     }
 
-    public function refuse()
+    public function getName()
     {
-        // TODO: Implement refuse() method.
+        return 'item';
     }
+
+    public function getValue()
+    {
+        // TODO: Implement getValue() method.
+    }
+
 
 }

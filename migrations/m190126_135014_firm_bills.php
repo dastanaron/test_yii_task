@@ -40,6 +40,7 @@ class m190126_135014_firm_bills extends Migration
 
         $this->execute('ALTER TABLE '.$this->tableName.' CHANGE `updated_at` `updated_at` TIMESTAMP on update CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP');
         $this->execute('ALTER TABLE '.$this->tableName.' CHANGE `created_at` `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP');
+        $this->fixtures();
     }
 
     /**
@@ -48,5 +49,11 @@ class m190126_135014_firm_bills extends Migration
     public function down()
     {
         $this->dropTable($this->tableName);
+    }
+
+    private function fixtures()
+    {
+        $sql = 'INSERT INTO `firm_bills` (`id`,`type`,`total_sum`,`created_at`,`updated_at`) VALUES (1,1,100000,\'2019-01-26 19:13:08\',\'2019-01-26 19:13:08\');';
+        $this->execute($sql);
     }
 }
